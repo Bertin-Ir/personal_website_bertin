@@ -1,0 +1,91 @@
+---
+import Math from './Math.astro';
+/** Human Model Card: mirrors ML model card format (Objective, Training Data, Capabilities,
+    Limitations, Evaluation). Tone: precise, honest, technical. Customize all fields below. */
+const card = {
+  objective: 'Deploy reliable ML systems that generalize under distribution shift; optimize for interpretability and decision quality, not only metric scores.',
+  trainingData: [
+    'Formal education: CS/Stats/ML; coursework in optimization, probability, ML systems.',
+    'Industry: production ML pipelines, A/B evaluation, causal inference in product teams.',
+    'Ongoing: papers (ML/NLP/systems), open-source contributions, internal tech talks.',
+  ],
+  capabilities: [
+    'Formulating decision-focused ML problems (loss, constraints, evaluation).',
+    'Designing and scaling training/eval pipelines; dealing with data leakage and label quality.',
+    'Interpreting models (feature importance, calibration, failure modes).',
+    'Communicating tradeoffs and limitations to stakeholders.',
+  ],
+  limitations: [
+    'Narrow expertise in some domains; depth vs breadth tradeoffs.',
+    'Production MLOps tooling: familiar but not always the primary implementer.',
+    'Research: consumer of SOTA, selective contributor rather than full-time researcher.',
+  ],
+  evaluation: [
+    'Shipped models that improved business metrics with documented guardrails.',
+    'Reduced eval-set gaming and clarified metric definitions in cross-functional teams.',
+    'Reproducible experiments and model cards where applicable.',
+  ],
+};
+---
+
+<section id="landing" class="min-h-screen flex flex-col justify-center px-6 py-24 md:px-12 lg:px-24">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-sm font-mono text-[var(--accent)] uppercase tracking-wider mb-2">Model Card</p>
+    <h1 class="text-3xl md:text-4xl font-semibold text-[var(--ink)] mb-2">Human Model Card</h1>
+    <p class="text-sm text-[var(--ink)]/70 mb-4">Transparency, tradeoffs, evaluation, limitations.</p>
+    <p class="text-sm text-[var(--ink)]/60 mb-10">
+      Core idea: <Math latex="\\mathbb{E}[\\text{error}] = \\text{Bias}^2 + \\text{Variance} + \\sigma^2" /> — we optimize for the right thing and document limitations.
+    </p>
+
+    <article class="space-y-8 text-[var(--ink)]">
+      <div>
+        <h2 class="text-sm font-mono text-[var(--accent)] mb-2">Objective</h2>
+        <p class="text-base leading-relaxed">{card.objective}</p>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-mono text-[var(--accent)] mb-2">Training Data</h2>
+        <ul class="list-none space-y-1.5 text-base leading-relaxed">
+          {card.trainingData.map((item) => (
+            <li class="pl-0">• {item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-mono text-[var(--accent)] mb-2">Capabilities</h2>
+        <ul class="list-none space-y-1.5 text-base leading-relaxed">
+          {card.capabilities.map((item) => (
+            <li class="pl-0">• {item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-mono text-[var(--accent)] mb-2">Known Limitations</h2>
+        <ul class="list-none space-y-1.5 text-base leading-relaxed opacity-90">
+          {card.limitations.map((item) => (
+            <li class="pl-0">• {item}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-mono text-[var(--accent)] mb-2">Evaluation Evidence</h2>
+        <ul class="list-none space-y-1.5 text-base leading-relaxed">
+          {card.evaluation.map((item) => (
+            <li class="pl-0">• {item}</li>
+          ))}
+        </ul>
+      </div>
+    </article>
+
+    <nav class="mt-14 flex flex-wrap gap-4">
+      <a href="#projects" class="text-sm font-mono text-[var(--accent)] hover:underline">Experiments →</a>
+      <a href="#skills" class="text-sm font-mono text-[var(--accent)] hover:underline">Capabilities →</a>
+      <a href="#visual" class="text-sm font-mono text-[var(--accent)] hover:underline">Visual Intuition →</a>
+      <a href="#trajectory" class="text-sm font-mono text-[var(--accent)] hover:underline">Trajectory →</a>
+      <a href="#contact" class="text-sm font-mono text-[var(--accent)] hover:underline">Contact →</a>
+    </nav>
+  </div>
+</section>

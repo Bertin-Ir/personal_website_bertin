@@ -1,0 +1,52 @@
+---
+// Full-height neural background: diagonal zone (hero) + horizontal zone (stats). Links hero to stats visually.
+---
+<div id="neural-hero-stats-bg" class="neural-hero-stats-bg absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+  <svg class="w-full h-full neural-hero-stats-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="neural-hero-stats-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.12" />
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.04" />
+      </linearGradient>
+    </defs>
+    <g class="text-[var(--accent)]" fill="currentColor" stroke="currentColor">
+      <!-- Horizontal zone only (stats); diagonal removed -->
+      <g opacity="0.08">
+        <line x1="5" y1="85" x2="25" y2="85" stroke-width="0.5" />
+        <line x1="30" y1="85" x2="50" y2="85" stroke-width="0.5" />
+        <line x1="55" y1="85" x2="75" y2="85" stroke-width="0.5" />
+        <line x1="80" y1="85" x2="100" y2="85" stroke-width="0.5" />
+      </g>
+      <g class="neural-node" fill="currentColor" stroke="none">
+        <circle cx="15" cy="85" r="1.2" opacity="0.35" />
+        <circle cx="40" cy="85" r="1" opacity="0.35" />
+        <circle cx="65" cy="85" r="1.2" opacity="0.35" />
+        <circle cx="90" cy="85" r="1" opacity="0.35" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .neural-hero-stats-bg {
+    color: var(--accent);
+  }
+  .neural-hero-stats-bg .neural-node {
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+  :global(#hero-stats-wrap.hero-hover) .neural-hero-stats-bg .neural-node {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    var wrap = document.getElementById('hero-stats-wrap');
+    if (!wrap) return;
+    var hero = wrap.querySelector('section');
+    if (!hero) return;
+    hero.addEventListener('mouseenter', function() { wrap.classList.add('hero-hover'); });
+    hero.addEventListener('mouseleave', function() { wrap.classList.remove('hero-hover'); });
+  })();
+</script>

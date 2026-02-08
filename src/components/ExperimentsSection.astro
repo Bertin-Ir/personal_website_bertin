@@ -1,0 +1,60 @@
+---
+import type { Experiment } from '../types';
+/** Experiment log: problem (decision-focused), strategies, metrics + justification, results.
+    Add slugs here and in pages/experiments/[slug].astro for new experiments. */
+const experiments: Experiment[] = [
+  {
+    id: 'recommendation-eval',
+    title: 'Recommendation system evaluation under distribution shift',
+    problem: 'Business wanted to optimize for long-term engagement; offline metrics (e.g. CTR) were known to be misaligned with retention. Decision: which metric and which offline protocol to trust for launch?',
+    strategies: 'Defined a decision-focused formulation: loss = expected regret over a chosen metric. Ran counterfactual evaluation and small-scale A/B to bound metric–outcome correlation. Documented assumptions (stationarity, no feedback loops).',
+    metrics: 'Primary: retention at 7d and 30d. Secondary: calibration of predicted engagement. Justification: retention is the business target; calibration ensures we can threshold sensibly.',
+    results: 'Shipped a model that improved 7d retention by ~X% (internal number) with a guardrail on worst-case degradation. Published internal model card and eval report.',
+    slug: 'recommendation-eval',
+  },
+  {
+    id: 'nlp-few-shot',
+    title: 'Few-shot intent classification with calibration',
+    problem: 'New intents with very few labeled examples; need reliable confidence scores for routing. Decision: how to train and evaluate so that we don’t overconfidently misroute?',
+    strategies: 'Used prompt-based few-shot setup with a base LM; added a calibration layer (temperature scaling) on a held-out set. Evaluated on out-of-distribution intents to test generalization.',
+    metrics: 'Accuracy, macro F1, ECE (expected calibration error). Justification: ECE directly addresses overconfidence; macro F1 for class imbalance.',
+    results: 'Achieved acceptable accuracy with ECE < 0.05 on OOD slice. Documented failure modes (ambiguous phrases, new slang) in model card.',
+    slug: 'nlp-few-shot',
+  },
+];
+---
+
+<section id="projects" class="px-6 py-20 md:px-12 lg:px-24 bg-[var(--surface)] border-t border-[var(--ink)]/10">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-sm font-mono text-[var(--accent)] uppercase tracking-wider mb-2">Experiment Log</p>
+    <h2 class="text-2xl md:text-3xl font-semibold text-[var(--ink)] mb-4">Projects — Experiments</h2>
+    <p class="text-[var(--ink)]/80 mb-10">Problem formulation, strategies, evaluation, and interpretation.</p>
+
+    <ul class="space-y-12">
+      {experiments.map((exp) => (
+        <li class="border-l-2 border-[var(--accent)]/40 pl-6 py-2">
+          <h3 class="text-lg font-semibold text-[var(--ink)] mb-3">{exp.title}</h3>
+          <div class="space-y-4 text-sm text-[var(--ink)]/90">
+            <div>
+              <span class="font-mono text-[var(--accent)]">Problem</span>
+              <p class="mt-1">{exp.problem}</p>
+            </div>
+            <div>
+              <span class="font-mono text-[var(--accent)]">Strategies & skillset</span>
+              <p class="mt-1">{exp.strategies}</p>
+            </div>
+            <div>
+              <span class="font-mono text-[var(--accent)]">Evaluation metrics + justification</span>
+              <p class="mt-1">{exp.metrics}</p>
+            </div>
+            <div>
+              <span class="font-mono text-[var(--accent)]">Results & interpretation</span>
+              <p class="mt-1">{exp.results}</p>
+            </div>
+          </div>
+          <a href={`/experiments/${exp.slug}/`} class="inline-block mt-3 text-sm font-mono text-[var(--accent)] hover:underline">View experiment →</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

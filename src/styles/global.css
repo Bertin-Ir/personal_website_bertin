@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: #FAFAFA;
+  --ink: #1a1a1a;
+  --accent: #00BFA6;
+  --accent-muted: rgba(0, 191, 166, 0.12);
+  --muted: #64748b;
+}
+
+.dark {
+  --surface: #0f0f0f;
+  --ink: #f1f5f9;
+  --accent: #00BFA6;
+  --accent-muted: rgba(0, 191, 166, 0.15);
+  --muted: #94a3b8;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  /* Readable base size; 16px avoids iOS zoom on input focus */
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  /* Safe area for notched devices */
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.15);
+}
+.dark .card-hover:hover {
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Swipe carousel */
+.carousel-container {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.carousel-slide {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.5; }
+  50% { transform: translateY(-8px) translateX(4px); opacity: 0.8; }
+}
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float 7s ease-in-out 1s infinite; }
+
+/* Bertin name: letter fade-in on load */
+.bertin-char {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: bertin-fade-in 0.5s ease-out forwards;
+}
+@keyframes bertin-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth theme transition: apply to elements that change with theme */
+header,
+body,
+main {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hero profile: subtle animated gradient ring / glow */
+.profile-hero-ring {
+  box-shadow: 0 0 0 1px rgba(0, 191, 166, 0.2), 0 0 24px -4px rgba(0, 191, 166, 0.15);
+  animation: hero-ring-pulse 4s ease-in-out infinite;
+}
+@keyframes hero-ring-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(0, 191, 166, 0.2), 0 0 24px -4px rgba(0, 191, 166, 0.15); }
+  50% { box-shadow: 0 0 0 2px rgba(0, 191, 166, 0.25), 0 0 32px -4px rgba(0, 191, 166, 0.2); }
+}
+
+/* Hero profile: subtle float animation */
+.profile-avatar-float .profile-avatar-hero {
+  animation: profile-float 5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-avatar-float .profile-avatar-hero {
+    animation: none;
+  }
+}
+@keyframes profile-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Build with me CTA: soft sparkle/glow pulse ~2s, fade in → glow → fade out; stops on hover/focus */
+.cta-build-with-me {
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: cta-glow-pulse 2s ease-in-out infinite;
+}
+.cta-build-with-me:hover,
+.cta-build-with-me:focus-visible {
+  animation: none;
+  transform: scale(1.03);
+  box-shadow: 0 0 20px 4px rgba(0, 191, 166, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta-build-with-me {
+    animation: none;
+  }
+}
+
+/* Responsive: ensure content doesn't overflow and has min touch target */
+@media (max-width: 639px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+@keyframes cta-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 191, 166, 0);
+  }
+  25% {
+    box-shadow: 0 0 14px 3px rgba(0, 191, 166, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(0, 191, 166, 0.35);
+  }
+  75% {
+    box-shadow: 0 0 14px 3px rgba(0, 191, 166, 0.2);
+  }
+}

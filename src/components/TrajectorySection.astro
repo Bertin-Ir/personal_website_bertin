@@ -1,0 +1,32 @@
+---
+/** Growth trajectory: where you started, patterns observed, what you're learning next.
+    Frame as convergence, not biography. */
+const trajectory = {
+  started: 'Started in software and applied math; moved into ML via optimization and probability. Early work on recommendation and ranking systems exposed the gap between offline metrics and business outcomes.',
+  patterns: 'Recurring themes: metric design and proxy alignment, distribution shift, calibration and uncertainty. Preference for interpretable models and explicit assumptions where the problem allows.',
+  next: 'Deliberately learning: causal inference for decision-making, robust ML under shift, and clearer model documentation (model cards, eval reports). Convergence toward "reliable under uncertainty" rather than peak benchmark scores.',
+};
+---
+
+<section id="trajectory" class="px-6 py-20 md:px-12 lg:px-24 bg-[var(--surface)] border-t border-[var(--ink)]/10">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-sm font-mono text-[var(--accent)] uppercase tracking-wider mb-2">Growth</p>
+    <h2 class="text-2xl md:text-3xl font-semibold text-[var(--ink)] mb-4">Trajectory</h2>
+    <p class="text-[var(--ink)]/80 mb-10">Convergence, not biography.</p>
+
+    <div class="space-y-8">
+      <div>
+        <h3 class="text-sm font-mono text-[var(--accent)] mb-2">Where I started</h3>
+        <p class="text-base leading-relaxed text-[var(--ink)]">{trajectory.started}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-mono text-[var(--accent)] mb-2">Patterns observed</h3>
+        <p class="text-base leading-relaxed text-[var(--ink)]">{trajectory.patterns}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-mono text-[var(--accent)] mb-2">Learning next</h3>
+        <p class="text-base leading-relaxed text-[var(--ink)]">{trajectory.next}</p>
+      </div>
+    </div>
+  </div>
+</section>

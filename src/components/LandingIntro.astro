@@ -1,0 +1,55 @@
+---
+// Role line (above intro), Intro line 1 (with name highlighted), Line 2 (tagline), Line 3 (supporting)
+const roleLine = "Machine Learning engineer / Data Scientist / Software engineer";
+const introLine1Prefix = "Hi there! I'm ";
+const introName = "Bertin Iradukunda";
+const introLine1Suffix = ", a CS and Math student at NYU Abu Dhabi.";
+const introLine2 = "Building intelligent systems that solve real problems.";
+const introLine3 = "I bring hands-on experience in machine learning, data science, and software development. I design and build efficient, scalable solutions with speed, curiosity, and a genuine love.";
+---
+
+<section class="relative overflow-hidden min-h-[70vh] flex flex-col items-center justify-center px-4 sm:px-6 py-16 sm:py-20">
+
+  <div class="relative flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl mx-auto md:items-start w-full min-w-0">
+    <div class="profile-hero flex-shrink-0 md:-ml-6 profile-avatar-float">
+      <div class="profile-avatar-hero profile-hero-ring w-36 h-36 md:w-48 md:h-48 rounded-full overflow-hidden ring-4 ring-[var(--accent)]/30 relative bg-[var(--ink)]/5">
+        <div class="avatar-fallback absolute inset-0 z-0 bg-gradient-to-br from-[var(--accent)] to-[#1E90FF] flex items-center justify-center text-white text-2xl font-bold">IB</div>
+        <img src="/profile.png" alt="Profile" class="absolute inset-0 z-10 w-full h-full object-cover object-center" style="object-position: center 22%;" width="192" height="192" />
+      </div>
+    </div>
+    <div class="text-center md:text-left flex-1">
+      <p class="role-line text-sm md:text-base font-medium text-[var(--accent)] mb-3 tracking-wide">
+        {roleLine}
+      </p>
+      <p class="intro-line1 text-base md:text-lg text-[var(--ink)]/90 mb-4 leading-snug">
+        {introLine1Prefix}<span class="text-[var(--accent)] font-semibold">{introName}</span>{introLine1Suffix}
+      </p>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--ink)] mb-5 leading-tight">
+        {introLine2}
+      </h1>
+      <p class="intro-line3 text-[var(--ink)]/80 text-base md:text-lg leading-relaxed max-w-xl mb-8">
+        {introLine3}
+      </p>
+      <div class="flex flex-wrap gap-3 sm:gap-4 justify-center md:justify-start">
+        <a href="/projects/" class="inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[44px] sm:min-h-0 border border-[var(--ink)]/20 text-[var(--ink)] font-medium rounded-lg hover:bg-[var(--accent-muted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]" aria-label="View projects">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+          View Projects
+        </a>
+        <a href="/resume/" class="inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[44px] sm:min-h-0 border border-[var(--ink)]/20 text-[var(--ink)] font-medium rounded-lg hover:bg-[var(--accent-muted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]" aria-label="Resume">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          Resume
+        </a>
+        <a href="/contact/" class="cta-build-with-me inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[44px] sm:min-h-0 border border-[var(--accent)]/50 text-[var(--accent)] font-medium rounded-lg hover:bg-[var(--accent-muted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]" aria-label="Build with me">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          Build with me
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.querySelectorAll('.profile-avatar-hero img').forEach(function(img) {
+    img.addEventListener('error', function() { img.style.display = 'none'; });
+  });
+</script>

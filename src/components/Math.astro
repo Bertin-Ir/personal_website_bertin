@@ -1,0 +1,41 @@
+---
+/** Renders LaTeX via KaTeX (lazy-loaded from CDN). Skips elements already rendered. */
+interface Props {
+  block?: boolean;
+  latex: string;
+}
+const { block = false, latex } = Astro.props;
+const id = `math-${Math.random().toString(36).slice(2, 9)}`;
+---
+{block ? (
+  <div id={id} class="my-3 overflow-x-auto" data-latex={latex} data-block></div>
+) : (
+  <span id={id} class="prose-math" data-latex={latex}></span>
+)}
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    function loadKaTeX() {
+      if (typeof window.katex !== 'undefined') {
+        // KaTeX loaded: render all [data-latex] elements that haven't been rendered yet.
+        document.querySelectorAll('[data-latex]').forEach(function (el) {
+          if (el.querySelector('.katex')) return;
+          var latex = el.dataset.latex;
+          var block = el.dataset.block !== undefined;
+          if (latex) {
+            try {
+              window.katex.render(latex, el, { displayMode: block, throwOnError: false });
+            } catch (_) {}
+          }
+        });
+        return;
+      }
+      // Lazy-load KaTeX from CDN, then re-run render.
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = function () { setTimeout(loadKaTeX, 50); };
+      document.head.appendChild(s);
+    }
+    loadKaTeX();
+  });
+</script>

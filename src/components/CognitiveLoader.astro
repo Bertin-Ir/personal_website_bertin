@@ -1,0 +1,133 @@
+---
+// Lightweight loading: math/code fragments moving slowly and randomly; fades out when content ready.
+---
+<div id="cognitive-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--surface)] transition-opacity duration-500" aria-hidden="true">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div id="loader-fragments" class="absolute inset-0"></div>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    var FRAGMENTS = [
+      'θ ← θ − η∇L',
+      'E[(y-ŷ)²]',
+      'argmin',
+      'Bias² + Var',
+      'f(x;θ)',
+      '∇L',
+      'P(y|x)',
+      'σ(z)',
+      'L(θ)',
+    ];
+    var count = Math.min(5 + Math.floor(Math.random() * 3), FRAGMENTS.length);
+    var chosen = FRAGMENTS.slice().sort(function() { return Math.random() - 0.5; }).slice(0, count);
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function createFragment(text) {
+      var el = document.createElement('div');
+      el.className = 'absolute text-xs font-mono whitespace-nowrap loader-frag';
+      el.style.color = 'var(--ink)';
+      el.style.opacity = '0.5';
+      el.textContent = text;
+      return el;
+    }
+
+    function removeLoader() {
+      var overlay = document.getElementById('cognitive-loader');
+      if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(function() { overlay.remove(); }, 500);
+      }
+    }
+
+    var removed = false;
+    function tryRemove() {
+      if (removed) return;
+      removed = true;
+      removeLoader();
+    }
+
+    var MIN_SHOW_MS = 500;
+    var MAX_SHOW_MS = 1300;
+    var minTimer = null;
+    var maxTimer = null;
+    var contentReady = false;
+
+    function onReady() {
+      contentReady = true;
+      if (minTimer) tryRemove();
+    }
+
+    function run() {
+      var container = document.getElementById('loader-fragments');
+      var overlay = document.getElementById('cognitive-loader');
+      if (!container || !overlay) { tryRemove(); return; }
+
+      minTimer = setTimeout(function() {
+        minTimer = null;
+        if (contentReady) tryRemove();
+      }, MIN_SHOW_MS);
+      maxTimer = setTimeout(tryRemove, MAX_SHOW_MS);
+
+      if (document.readyState === 'complete') {
+        contentReady = true;
+      } else {
+        window.addEventListener('load', onReady);
+      }
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          onReady();
+        });
+      });
+
+      var w = container.offsetWidth || window.innerWidth;
+      var h = container.offsetHeight || window.innerHeight;
+
+      chosen.forEach(function(text, i) {
+        var el = createFragment(text);
+        container.appendChild(el);
+        var x = Math.random() * (w - 80) + 40;
+        var y = Math.random() * (h - 40) + 20;
+        var dx = (Math.random() - 0.5) * 0.08;
+        var dy = (Math.random() - 0.5) * 0.08;
+        el.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+        el._x = x;
+        el._y = y;
+        el._dx = dx;
+        el._dy = dy;
+        el._w = w;
+        el._h = h;
+      });
+
+      if (reduceMotion) return;
+
+      var start = null;
+      function animate(t) {
+        if (!start) start = t;
+        chosen.forEach(function(_, i) {
+          var el = container.children[i];
+          if (!el || el._dx === undefined) return;
+          var margin = 40;
+          el._x += el._dx * 16;
+          el._y += el._dy * 16;
+          if (el._x < margin || el._x > el._w - margin) el._dx = -el._dx;
+          if (el._y < margin || el._y > el._h - margin) el._dy = -el._dy;
+          el._x = Math.max(margin, Math.min(el._w - margin, el._x));
+          el._y = Math.max(margin, Math.min(el._h - margin, el._y));
+          el.style.transform = 'translate(' + el._x + 'px,' + el._y + 'px)';
+        });
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      run();
+    }
+  })();
+</script>

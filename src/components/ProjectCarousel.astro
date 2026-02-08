@@ -1,0 +1,203 @@
+---
+import type { Project } from '../data/projects';
+const { projects } = Astro.props;
+
+const skillIcons: Record<string, string> = {
+  'Machine Learning': '🤖',
+  'Data Analysis': '📊',
+  Python: '🐍',
+  Pandas: '🐼',
+  NumPy: '🔢',
+  'Scikit-learn': '🤖',
+  'Data Visualization': '📉',
+  Matplotlib: '📉',
+  'C++': '◉',
+  'Data Structures': '📦',
+  Algorithms: '⚙',
+  OOP: '◆',
+  'Command-Line Interfaces': '⌘',
+  'Hash Tables': '#',
+  'Embedded Systems': '⚡',
+  Arduino: '⚡',
+  'Sensors & Hardware Integration': '🔌',
+  'Signal Processing': '〰',
+  'System Modeling': '▣',
+  'Web scraping': '🌐',
+};
+function skillIcon(name: string): string {
+  return skillIcons[name] ?? '•';
+}
+---
+
+<section class="px-4 sm:px-6 py-12 md:py-16" aria-label="Projects">
+  <div class="max-w-4xl mx-auto w-full min-w-0 overflow-x-hidden">
+    <h1 class="text-2xl md:text-3xl font-bold text-[var(--ink)] mb-8">Projects</h1>
+
+    <div class="relative">
+      <div
+        id="carousel"
+        class="carousel-container flex overflow-x-auto gap-6 pb-4 snap-x scrollbar-hide"
+        style="scroll-behavior: smooth;"
+        aria-label="Project cards carousel"
+      >
+        {projects.map((project) => (
+          <div class="carousel-slide flex-shrink-0 w-[85vw] sm:w-[320px] md:w-[360px]">
+            <div class="project-card-wrapper group/card w-full flex flex-col">
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-card group block w-full flex-shrink-0 min-h-[220px] p-5 rounded-2xl border border-[var(--ink)]/10 bg-[var(--surface)] hover:border-[var(--accent)]/40 hover:shadow-[0_8px_30px_-8px_rgba(0,191,166,0.25)] transition-all duration-300 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] cursor-pointer"
+              >
+                <h2 class="text-lg font-bold text-[var(--accent)] mb-2 group-hover:text-[var(--accent)]">
+                  {project.title}
+                </h2>
+                <p class="project-desc text-[var(--ink)]/80 text-sm leading-snug line-clamp-3 group-hover:line-clamp-none mb-4 transition-all duration-200">
+                  {project.description}
+                </p>
+                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--ink)]/60 group-hover:text-[var(--accent)] transition-colors">
+                  <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z" />
+                  </svg>
+                  View on GitHub
+                </span>
+              </a>
+              {/* Skill chips below card (in flow so they are visible and not clipped) */}
+              <div
+                class="project-chips-float pointer-events-none group-hover/card:pointer-events-auto flex flex-wrap gap-2 justify-center gap-y-1.5 min-h-[2.5rem] pt-2 px-1 opacity-0 group-hover/card:opacity-100 group-focus-within/card:opacity-100 transition-opacity duration-300"
+                role="group"
+                aria-label="Project skills"
+              >
+                {project.techStack.map((skill, i) => (
+                  <a
+                    href="/resume/#skills"
+                    class="skill-chip inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--surface)] border border-[var(--accent)]/30 text-[var(--ink)]/90 text-xs font-medium shadow-md hover:border-[var(--accent)] hover:shadow-[0_0_12px_rgba(0,191,166,0.25)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] transition-all duration-200"
+                    style={`animation-delay: ${i * 40}ms`}
+                    title={`See skills: ${skill}`}
+                  >
+                    <span aria-hidden="true">{skillIcon(skill)}</span>
+                    {skill}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        id="prev-btn"
+        type="button"
+        class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 md:-translate-x-12 w-11 h-11 md:w-10 md:h-10 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 rounded-full bg-[var(--surface)] border border-[var(--ink)]/20 shadow-lg flex items-center justify-center hover:bg-[var(--accent-muted)] hover:border-[var(--accent)]/40 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+        aria-label="Previous project"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+      <button
+        id="next-btn"
+        type="button"
+        class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 md:translate-x-12 w-11 h-11 md:w-10 md:h-10 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 rounded-full bg-[var(--surface)] border border-[var(--ink)]/20 shadow-lg flex items-center justify-center hover:bg-[var(--accent-muted)] hover:border-[var(--accent)]/40 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+        aria-label="Next project"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+
+    <div class="flex justify-center gap-2 mt-6 flex-wrap">
+      {projects.map((_, i) => (
+        <button
+          type="button"
+          class="carousel-dot min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+          data-index={i}
+          aria-label={`Go to project ${i + 1}`}
+        >
+          <span class="dot-bg w-2 h-2 rounded-full bg-[var(--ink)]/30"></span>
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .project-card {
+    transform: translateY(0);
+  }
+  .project-card:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Floating skill chips: subtle drift when visible */
+  .skill-chip {
+    animation: skill-chip-float 5s ease-in-out infinite;
+  }
+  .skill-chip:hover,
+  .skill-chip:focus-visible {
+    animation: none;
+  }
+  @keyframes skill-chip-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skill-chip {
+      animation: none;
+    }
+  }
+
+  .carousel-dot[data-active="true"] .dot-bg {
+    background-color: var(--accent);
+  }
+</style>
+
+<script>
+  (function () {
+    var carousel = document.getElementById('carousel');
+    var prevBtn = document.getElementById('prev-btn');
+    var nextBtn = document.getElementById('next-btn');
+    var dots = document.querySelectorAll('.carousel-dot');
+    if (!carousel || !prevBtn || !nextBtn) return;
+
+    var slides = carousel.querySelectorAll('.carousel-slide');
+    var count = slides.length;
+    var current = 0;
+
+    function getSlideWidth() {
+      var first = slides[0];
+      if (!first) return 380;
+      return first.offsetWidth + 24;
+    }
+
+    function scrollTo(i) {
+      current = Math.max(0, Math.min(i, count - 1));
+      carousel.scrollTo({ left: current * getSlideWidth(), behavior: 'smooth' });
+      dots.forEach(function (d, j) {
+        d.setAttribute('data-active', j === current ? 'true' : '');
+      });
+    }
+
+    prevBtn.addEventListener('click', function () {
+      scrollTo(current - 1);
+    });
+    nextBtn.addEventListener('click', function () {
+      scrollTo(current + 1);
+    });
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () {
+        scrollTo(i);
+      });
+    });
+
+    carousel.addEventListener('scroll', function () {
+      var w = getSlideWidth();
+      var idx = Math.round(carousel.scrollLeft / w);
+      if (idx !== current && idx >= 0 && idx < count) {
+        current = idx;
+        dots.forEach(function (d, j) {
+          d.setAttribute('data-active', j === current ? 'true' : '');
+        });
+      }
+    });
+
+    if (dots[0]) dots[0].setAttribute('data-active', 'true');
+  })();
+</script>

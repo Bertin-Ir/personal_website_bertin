@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LandingIntro from '../components/LandingIntro.astro';
+import StatsPanel from '../components/StatsPanel.astro';
+import NeuralHeroStatsBg from '../components/NeuralHeroStatsBg.astro';
+---
+<BaseLayout title="Home | Bertin" description="Bertin — ML Engineer & Data Scientist. Projects, Resume, Contact.">
+  <div id="hero-stats-wrap" class="relative">
+    <NeuralHeroStatsBg />
+    <LandingIntro />
+    <StatsPanel />
+  </div>
+</BaseLayout>

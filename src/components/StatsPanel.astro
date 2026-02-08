@@ -1,0 +1,72 @@
+---
+const stats = [
+  { value: 6, suffix: '+', label: 'Projects shipped' },
+  { value: 3, suffix: '+', label: 'Years research & applied' },
+  { value: 18, suffix: '+', label: 'Technologies mastered' },
+];
+---
+
+<section class="px-4 sm:px-6 py-12 md:py-16" aria-label="Highlights">
+  <div class="max-w-4xl mx-auto w-full min-w-0">
+    <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-16">
+      {stats.map((stat) => (
+        <div class="stat-item flex flex-col items-center text-center group" data-value={stat.value} data-suffix={stat.suffix}>
+          <p class="text-2xl md:text-3xl font-bold text-[var(--accent)] mb-1 transition-transform duration-200 group-hover:scale-105">
+            <span class="stat-value">0</span><span class="stat-suffix">{stat.suffix}</span>
+          </p>
+          <p class="text-sm text-[var(--ink)]/70">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.stat-item').forEach(function(card) {
+    var target = parseInt(card.dataset.value || '0', 10);
+    var suffix = card.dataset.suffix || '';
+    var valEl = card.querySelector('.stat-value');
+    if (!valEl) return;
+    var duration = 1500;
+    var start = null;
+    function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+    function animate(ts) {
+      if (!start) start = ts;
+      var elapsed = ts - start;
+      var progress = Math.min(elapsed / duration, 1);
+      var eased = easeOutQuart(progress);
+      var current = Math.floor(target * eased);
+      valEl.textContent = current;
+      if (progress < 1) requestAnimationFrame(animate);
+      else valEl.textContent = target;
+    }
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          requestAnimationFrame(animate);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    observer.observe(card);
+  });
+</script>
+
+<style>
+  .stat-item {
+    position: relative;
+  }
+  @media (min-width: 640px) {
+    .stat-item + .stat-item::before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 2rem;
+      background: var(--ink);
+      opacity: 0.1;
+    }
+  }
+</style>
