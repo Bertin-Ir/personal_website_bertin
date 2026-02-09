@@ -32,8 +32,8 @@ jobs:
       - name: Build Astro
         run: npm run build
         env:
-          # Required for project sites: https://username.github.io/Personal_website/
-          BASE_PATH: /Personal_website/
+          # Custom domain (bertin.ira.dev) is served at root; use base /
+          BASE_PATH: /
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
