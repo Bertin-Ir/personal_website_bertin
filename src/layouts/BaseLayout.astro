@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import { ViewTransitions } from 'astro:transitions';
 import CognitiveLoader from '../components/CognitiveLoader.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 
@@ -32,7 +31,6 @@ const navLinks = [
     <meta name="theme-color" content="#FAFAFA" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
-    <ViewTransitions />
   </head>
   <body class="min-h-screen antialiased bg-[var(--surface)] text-[var(--ink)] transition-colors duration-300">
     <CognitiveLoader />
