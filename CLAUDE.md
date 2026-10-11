@@ -27,9 +27,10 @@ npm run preview   # astro preview
 src/
   layouts/BaseLayout.astro     # <html>, header/nav, ThemeToggle, page shell
   pages/
-    index.astro                # Home: NeuralHeroStatsBg + LandingIntro + StatsPanel
+    index.astro                # Home: LandingIntro (hero + NodeNetwork) + FeaturedWork + CTAs + StatsPanel
     projects/index.astro       # ProjectCarousel fed by data/projects.ts
     resume/index.astro         # ResumePanel fed by data/resume.ts
+    services/index.astro       # ServicesPanel: service cards deep-linking to projects/roles
     skills/index.astro         # redirects to /resume/ (skills live inside Resume page)
     contact/index.astro        # Formspree-backed contact form
   components/                  # Astro components (see "Live vs. orphaned" below)
@@ -39,7 +40,7 @@ src/
   data/skills.ts                # skill name/category/level/tooltip, used by ResumePanel
   styles/global.css             # theme CSS vars, fonts, custom animations/keyframes
   types/index.ts
-public/                         # favicon.svg, profile.png, CNAME
+public/                         # favicon.svg, profile-avatar.webp (nav), project-images/*.webp, CNAME
 docs/CLOUDFLARE_522_CHECKLIST.md  # DNS/proxy runbook for the custom domain
 .github/workflows/deploy-pages.yml # builds with BASE_PATH=/ and deploys dist/ to GitHub Pages
 ```
@@ -49,8 +50,10 @@ docs/CLOUDFLARE_522_CHECKLIST.md  # DNS/proxy runbook for the custom domain
 Only some `src/components/*.astro` files are actually imported by a page:
 
 - **Live:** `CognitiveLoader`, `ThemeToggle` (via `BaseLayout`); `LandingIntro`,
-  `StatsPanel`, `NeuralHeroStatsBg` (via `pages/index.astro`); `ProjectCarousel`
-  (via `pages/projects`); `ResumePanel` (via `pages/resume`).
+  `FeaturedWork`, `StatsPanel` (via `pages/index.astro`), `NodeNetwork`
+  (canvas hero background, via `LandingIntro`); `ProjectCarousel`
+  (via `pages/projects`); `ResumePanel` (via `pages/resume`);
+  `ServicesPanel` (via `pages/services`).
 - **Not currently wired into any page:** `SkillsSection.astro`,
   `TrajectorySection.astro`, `ExperimentsSection.astro`, `HumanModelCard.astro`,
   `VisualIntuitionSection.astro` (the wrapper for the four React ML-demo
@@ -62,7 +65,10 @@ Only some `src/components/*.astro` files are actually imported by a page:
 
 - **Colors** are CSS custom properties in `src/styles/global.css`, swapped by
   the `.dark` class: `--surface`, `--ink`, `--accent` (`#00BFA6` teal, same in
-  both themes), `--accent-muted`, `--muted`. Tailwind's `tailwind.config.mjs`
+  both themes), `--accent-muted`, `--muted`. Use `--accent-text` (not `--accent`) for teal text/icons:
+  `#00BFA6` is only 2.2:1 on the light surface. The shared `--ds-*` panel tokens have
+  light-mode values under `:root:not(.dark)`; translucent tints use
+  `rgba(var(--ds-accent-rgb), a)` so they follow the theme. Tailwind's `tailwind.config.mjs`
   also defines `surface`/`ink`/`accent` (teal/blue/coral) and `sans`/`mono`
   font families, but in practice components use the CSS vars directly
   (`text-[var(--ink)]`, `bg-[var(--accent-muted)]`) rather than the Tailwind

@@ -17,10 +17,25 @@ const currentPath = Astro.url.pathname;
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/projects/', label: 'Projects' },
-  { href: '/ventures/', label: 'Ventures' },
-  { href: '/resume/', label: 'Resume' },
+  { href: '/resume/', label: 'Work Experience' },
+  { href: '/education/', label: 'Education' },
+  { href: '/skills/', label: 'Skills' },
+  { href: '/services/', label: 'Services' },
   { href: '/contact/', label: 'Build with me' },
 ];
+type NavLink = (typeof navLinks)[number];
+const isActive = (link: NavLink) => (link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href));
+function linkClass(link: NavLink, variant: 'desktop' | 'mobile') {
+  const base = 'flex items-center text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] whitespace-nowrap';
+  const size = variant === 'desktop' ? 'px-3 py-2.5 justify-center' : 'px-4 min-h-[48px] w-full text-base';
+  const active = isActive(link);
+  const tone = link.label === 'Build with me'
+    ? 'cta-build-with-me border border-[var(--accent)]/50 text-[var(--accent-text)] hover:bg-[var(--accent-muted)]' + (active ? ' bg-[var(--accent-muted)]' : '') + (variant === 'mobile' ? ' mt-2 justify-center' : '')
+    : active
+      ? 'text-[var(--accent-text)] bg-[var(--accent-muted)]'
+      : 'text-[var(--ink)]/80 hover:text-[var(--accent-text)] hover:bg-[var(--accent-muted)]';
+  return `${base} ${size} ${tone}`;
+}
 ---
 <!doctype html>
 <html lang="en" class="dark">
@@ -29,49 +44,67 @@ const navLinks = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#FAFAFA" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#F2F7F6" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
   <body class="min-h-screen antialiased bg-[var(--surface)] text-[var(--ink)] transition-colors duration-300">
     <CognitiveLoader />
-    <header class="fixed top-0 left-0 right-0 z-50 flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-8 md:grid md:grid-cols-[1fr_auto_1fr] md:gap-4 bg-[var(--surface)]/90 backdrop-blur-sm border-b border-[var(--ink)]/5 transition-colors duration-300 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.75rem,env(safe-area-inset-top))]">
-      <a href="/" class="flex items-center gap-2 md:gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] rounded-lg touch-target min-h-[44px] md:min-h-0">
+    <!-- Full nav from lg (1024px); below that the links move into a toggleable menu panel. -->
+    <header class="site-header fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-2 px-4 py-3 md:px-8 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-4 bg-[var(--surface)]/90 backdrop-blur-sm border-b border-[var(--ink)]/5 transition-colors duration-300 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.75rem,env(safe-area-inset-top))]">
+      <a href="/" class="flex items-center gap-2 md:gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] rounded-lg touch-target min-h-[44px] lg:min-h-0 shrink-0">
         <div class="profile-avatar w-9 h-9 rounded-full overflow-hidden ring-2 ring-[var(--accent)]/30 group-hover:ring-[var(--accent)] transition-all flex-shrink-0 relative">
           <div class="avatar-fallback absolute inset-0 z-0 bg-gradient-to-br from-[var(--accent)] to-[#1E90FF] flex items-center justify-center text-white text-xs font-semibold">IB</div>
-          <img src="/profile.png" alt="Profile" class="absolute inset-0 z-10 w-full h-full object-cover object-center" />
+          <img src="/profile-avatar.webp" alt="Profile" width="36" height="45" class="absolute inset-0 z-10 w-full h-full object-cover object-center" />
         </div>
-        <span class="font-semibold text-[var(--ink)] hidden sm:inline bertin-name" aria-hidden="true">
+        <span class="font-semibold text-[var(--ink)] hidden sm:inline whitespace-nowrap bertin-name" aria-hidden="true">
           {brandName.split('').map((char, i) => (
             <span class="bertin-char inline-block" style={`animation-delay: ${i * 60}ms`}>{char}</span>
           ))}
         </span>
       </a>
 
-      <nav class="flex items-center gap-1 md:justify-self-center order-last md:order-none w-full md:w-auto justify-center flex-wrap justify-center md:flex-nowrap" aria-label="Main navigation">
-        {navLinks.map((link) => {
-          const isActive = link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
-          const isBuildWithMe = link.label === 'Build with me';
-          const baseClass = 'px-3 py-2.5 min-h-[44px] md:min-h-0 flex items-center justify-center text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]';
-          const buildWithMeClass = isBuildWithMe ? 'cta-build-with-me border border-[var(--accent)]/50 text-[var(--accent)] hover:bg-[var(--accent-muted)]' + (isActive ? ' bg-[var(--accent-muted)]' : '') : '';
-          const defaultClass = !isBuildWithMe ? (isActive ? 'text-[var(--accent)] bg-[var(--accent-muted)]' : 'text-[var(--ink)]/80 hover:text-[var(--accent)] hover:bg-[var(--accent-muted)]') : '';
-          return (
-            <a
-              href={link.href}
-              class={`${baseClass} ${buildWithMeClass} ${defaultClass}`}
-            >
-              {link.label}
-            </a>
-          );
-        })}
+      <nav class="hidden lg:flex items-center gap-1 justify-self-center" aria-label="Main navigation">
+        {navLinks.map((link) => (
+          <a href={link.href} class={linkClass(link, 'desktop')} aria-current={isActive(link) ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))}
       </nav>
 
-      <div class="flex items-center md:justify-self-end touch-target">
+      <div class="flex items-center gap-2 lg:justify-self-end touch-target">
         <ThemeToggle />
+        <button
+          type="button"
+          class="menu-toggle lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-[var(--ink)]/20 text-[var(--ink)] hover:bg-[var(--accent-muted)] hover:border-[var(--accent)]/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          aria-controls="mobile-nav"
+          aria-expanded="false"
+          aria-label="Open menu"
+        >
+          <svg class="menu-icon-open w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <svg class="menu-icon-close w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
       </div>
+
+      <nav
+        id="mobile-nav"
+        class="mobile-nav lg:hidden absolute left-0 right-0 top-full border-b border-[var(--ink)]/10 bg-[var(--surface)] shadow-lg pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] py-3"
+        aria-label="Main navigation"
+        hidden
+      >
+        <ul class="flex flex-col gap-1 max-w-md mx-auto">
+          {navLinks.map((link) => (
+            <li>
+              <a href={link.href} class={linkClass(link, 'mobile')} aria-current={isActive(link) ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
 
-    <main class="pt-16 min-h-screen pl-[env(safe-area-inset-left,0)] pr-[env(safe-area-inset-right,0)] pb-[env(safe-area-inset-bottom,0)]">
+    <main class="pt-[calc(4rem+env(safe-area-inset-top,0px))] min-h-screen pl-[env(safe-area-inset-left,0)] pr-[env(safe-area-inset-right,0)] pb-[env(safe-area-inset-bottom,0)]">
       <slot />
     </main>
     <script is:inline>
@@ -79,6 +112,53 @@ const navLinks = [
         img.addEventListener('error', function() { img.style.display = 'none'; });
         if (img.complete && img.naturalWidth === 0) img.style.display = 'none';
       });
+
+      // Mobile menu: toggle, close on link tap / Escape / outside tap / widening to the desktop nav.
+      (function () {
+        var btn = document.querySelector('.menu-toggle');
+        var panel = document.getElementById('mobile-nav');
+        if (!btn || !panel) return;
+        function setOpen(open) {
+          panel.hidden = !open;
+          btn.setAttribute('aria-expanded', String(open));
+          btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          btn.querySelector('.menu-icon-open').classList.toggle('hidden', open);
+          btn.querySelector('.menu-icon-close').classList.toggle('hidden', !open);
+        }
+        btn.addEventListener('click', function () { setOpen(panel.hidden); });
+        panel.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && !panel.hidden) { setOpen(false); btn.focus(); }
+        });
+        document.addEventListener('click', function (e) {
+          if (!panel.hidden && !panel.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+        });
+        window.matchMedia('(min-width: 1024px)').addEventListener('change', function (e) { if (e.matches) setOpen(false); });
+      })();
+
+      // Hovering/focusing a skill or tech chip highlights every chip for the same skill on the page.
+      (function () {
+        var active = null;
+        function set(key) {
+          if (key === active) return;
+          if (active !== null) {
+            document.querySelectorAll('.skill-pulse').forEach(function (el) { el.classList.remove('skill-pulse'); });
+          }
+          active = key;
+          if (key) {
+            document.querySelectorAll('[data-skill]').forEach(function (el) {
+              if (el.getAttribute('data-skill') === key) el.classList.add('skill-pulse');
+            });
+          }
+        }
+        function keyFrom(e) {
+          var el = e.target instanceof Element ? e.target.closest('[data-skill]') : null;
+          return el ? el.getAttribute('data-skill') : null;
+        }
+        document.addEventListener('pointerover', function (e) { set(keyFrom(e)); });
+        document.addEventListener('focusin', function (e) { set(keyFrom(e)); });
+        document.addEventListener('focusout', function () { set(null); });
+      })();
     </script>
   </body>
 </html>

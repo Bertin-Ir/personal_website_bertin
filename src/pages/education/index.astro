@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { education } from '../../data/resume';
+---
+<BaseLayout title="Education | Bertin" description="Education — degrees, programs, and coursework">
+  <!-- Same ds-* panel tokens and components as the Work Experience / Projects pages -->
+  <section class="px-3 sm:px-4 lg:px-6 pt-8 pb-12 md:pb-16" aria-labelledby="education-title">
+    <div class="max-w-5xl mx-auto w-full min-w-0">
+      <h1 id="education-title" class="text-2xl md:text-3xl font-bold text-[var(--ink)] mb-8">Education</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {education.map((edu, i) => (
+          <article class="ds-card rounded-2xl p-5 md:p-6 flex flex-col" aria-labelledby={`edu-${i}`}>
+            <header class="flex justify-between items-start gap-4">
+              <h2 id={`edu-${i}`} class="edu-institution text-lg md:text-xl font-bold leading-tight min-w-0">{edu.institution}</h2>
+              <p class="edu-pill font-mono text-xs whitespace-nowrap shrink-0 ml-auto">
+                {edu.location}{edu.year ? `, ${edu.year}` : ''}
+              </p>
+            </header>
+            {edu.degree && (
+              <p class="edu-degree text-sm md:text-base font-medium mt-3">{edu.degree}</p>
+            )}
+            {edu.minor && (
+              <p class="edu-text text-sm mt-1">{edu.minor}</p>
+            )}
+            {(edu.expectedGraduation || edu.gpa != null) && (
+              <dl class="flex flex-wrap gap-1.5 mt-4">
+                {edu.expectedGraduation && (
+                  <div class="edu-pill font-mono text-xs">
+                    <dt class="inline">Expected Graduation:</dt> <dd class="inline">{edu.expectedGraduation}</dd>
+                  </div>
+                )}
+                {edu.gpa != null && (
+                  <div class="edu-pill font-mono text-xs">
+                    <dt class="inline">GPA:</dt> <dd class="inline">{edu.gpa}/4</dd>
+                  </div>
+                )}
+              </dl>
+            )}
+            {edu.courses && (
+              <p class="edu-text text-sm leading-relaxed mt-4">
+                <span class="edu-label font-mono text-xs uppercase">Courses:</span> {edu.courses}
+              </p>
+            )}
+            {edu.courseList && edu.courseList.length > 0 && (
+              <div class="mt-4">
+                <p class="edu-label font-mono text-xs uppercase mb-2">Courses:</p>
+                <ul class="edu-text text-sm leading-relaxed space-y-1.5">
+                  {edu.courseList.map((c) => (
+                    <li class="flex gap-2">
+                      <svg class="edu-chevron w-3.5 h-3.5 mt-[0.3rem] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                      </svg>
+                      <span>{c}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .edu-institution {
+    color: var(--ds-heading);
+  }
+  .edu-degree {
+    color: var(--ds-accent);
+  }
+  .edu-text {
+    color: var(--ds-text);
+  }
+  .edu-label {
+    letter-spacing: 0.08em;
+    color: var(--ds-muted);
+  }
+  .edu-chevron {
+    color: var(--ds-accent-2);
+  }
+  /* Same pill treatment as the Work Experience date/location chip (.tl-period) */
+  .edu-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid var(--ds-border);
+    color: var(--ds-muted);
+  }
+</style>

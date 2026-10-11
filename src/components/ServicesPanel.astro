@@ -1,0 +1,139 @@
+---
+import { projects } from '../data/projects';
+import { experience } from '../data/resume';
+import { experienceSlug, projectAnchor } from '../lib/slug';
+
+// Every tag below was checked against data/projects.ts (techStack + description) and
+// data/resume.ts (bullets/skills). Tags reference entries by id / role+company, so a
+// renamed or removed entry fails the build instead of shipping a dead link.
+type TagRef = { project: string } | { role: string; company: string };
+
+const SERVICES: { title: string; icon: string; description: string; tags: TagRef[] }[] = [
+  {
+    title: 'Machine Learning & Predictive Modeling',
+    icon: 'beaker',
+    description:
+      'Developing models for classification, prediction, and recommendation—from feature engineering to evaluation, with a focus on models that hold up outside the notebook and generalize in the real world applications.',
+    tags: [{ project: '7' }, { project: '1' }, { project: '10' }],
+  },
+  {
+    title: 'Database Design & Data Systems',
+    icon: 'database',
+    description:
+      'Designing relational schemas and data workflows that keep information consistent, accessible, and secure. Grounded in work spanning database-backed applications and access control for data pipelines.',
+    tags: [{ role: 'Analytics Engineering Intern', company: 'Irembo' }, { project: '12' }, { project: '11' }],
+  },
+  {
+    title: 'Data Analysis & Insights',
+    icon: 'chart',
+    description:
+      'Using data cleaning, exploratory analysis, and statistical modeling to answer specific questions and uncover useful patterns. Turning findings into clear, evidence-based conclusions that support decisions.',
+    tags: [
+      { role: 'Data Scientist', company: 'Sun Wolf Industries' },
+      { role: 'Research Analyst Intern', company: 'Mentora' },
+      { project: '1' },
+    ],
+  },
+  {
+    title: 'Web Application Development',
+    icon: 'globe',
+    description:
+      'Building full-stack applications across the database, backend, and user interface. Connecting the underlying data and application logic into cohesive experiences people can use.',
+    tags: [{ project: '12' }, { project: '11' }],
+  },
+  {
+    title: 'Software Engineering & Infrastructure',
+    icon: 'server',
+    description:
+      'Developing software and supporting systems with an emphasis on reliability, maintainability, and clear system design for software engineering',
+    tags: [
+      { role: 'Analytics Engineering Intern', company: 'Irembo' },
+      { project: '9' },
+      { project: '11' },
+      { project: '12' },
+    ],
+  },
+];
+
+// Short display names where a project's full title is long.
+const SHORT_TITLE: Record<string, string> = { '7': 'Web & App Ad CTR Prediction' };
+
+function resolveTag(ref: TagRef) {
+  if ('project' in ref) {
+    const p = projects.find((x) => x.id === ref.project);
+    if (!p) throw new Error(`ServicesPanel: no project with id ${ref.project}`);
+    return { label: SHORT_TITLE[p.id] ?? p.title, href: `/projects/#${projectAnchor(p.id)}` };
+  }
+  const e = experience.find((x) => x.role === ref.role && x.company === ref.company);
+  if (!e) throw new Error(`ServicesPanel: no experience entry ${ref.role} @ ${ref.company}`);
+  return { label: `${e.role} (${e.company})`, href: `/resume/#${experienceSlug(e)}` };
+}
+
+// Heroicons v1 outline paths, same set as the Skills page.
+const ICONS: Record<string, string> = {
+  beaker: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+  database: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+  chart: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+  globe: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
+  server: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01',
+};
+
+const services = SERVICES.map((s) => ({ ...s, tags: s.tags.map(resolveTag) }));
+---
+
+<section class="px-3 sm:px-4 lg:px-6 pt-8 pb-12 md:pb-16" aria-labelledby="services-title">
+  <div class="max-w-5xl mx-auto w-full min-w-0">
+    <header class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+      <div class="min-w-0 max-w-2xl">
+        <h1 id="services-title" class="text-2xl md:text-3xl font-bold text-[var(--ink)]">Services</h1>
+        <p class="services-intro text-sm md:text-base leading-relaxed mt-2">
+          Practical solutions, backed by real projects and hands-on experience. Explore what I can help with and the work behind each capability.
+        </p>
+      </div>
+      <a href="/contact/" class="ds-btn ds-btn--accent self-start shrink-0">
+        Hire me <span aria-hidden="true">→</span>
+      </a>
+    </header>
+
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {services.map((s, i) => (
+        <li class:list={['flex', { 'md:col-span-2': i === services.length - 1 && services.length % 2 === 1 }]}>
+          <article class="ds-card w-full rounded-2xl p-5 md:p-6 flex flex-col" aria-labelledby={`service-${i}`}>
+            <div class="flex items-center gap-4">
+              <span class="service-icon inline-flex items-center justify-center w-11 h-11 rounded-xl flex-shrink-0" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS[s.icon]} />
+                </svg>
+              </span>
+              <h2 id={`service-${i}`} class="service-title text-lg md:text-xl font-bold leading-tight">{s.title}</h2>
+            </div>
+            <p class="service-body text-sm leading-relaxed mt-4">{s.description}</p>
+            <ul class="flex flex-wrap gap-1.5 mt-auto pt-5" aria-label={`Work behind ${s.title}`}>
+              {s.tags.map((t) => (
+                <li><a href={t.href} class="ds-badge ds-badge--accent">{t.label}</a></li>
+              ))}
+            </ul>
+          </article>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services-intro {
+    color: var(--ds-muted);
+  }
+  /* Same tinted-cyan icon badge as the Skills page */
+  .service-icon {
+    color: var(--ds-accent);
+    background: rgba(var(--ds-accent-rgb), 0.08);
+    border: 1px solid rgba(var(--ds-accent-rgb), 0.25);
+  }
+  .service-title {
+    color: var(--ds-heading);
+  }
+  .service-body {
+    color: var(--ds-text);
+  }
+</style>

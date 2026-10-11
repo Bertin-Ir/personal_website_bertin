@@ -1,0 +1,166 @@
+---
+// MLP diagram with animated dropout, used to flank the hero text.
+// Hidden below lg (1024px): on phones and tablets the text needs the full width, and the
+// hero's NodeNetwork mesh carries the visual.
+interface Props {
+  /** 'right' mirrors the network so the input layer sits on the outer edge on both sides. */
+  side: 'left' | 'right';
+}
+const { side } = Astro.props;
+---
+<div class="hidden lg:block relative w-full h-96" aria-hidden="true">
+  <canvas class="dropout-net absolute inset-0 w-full h-full" data-side={side}></canvas>
+</div>
+
+<script>
+  type NetNode = { x: number; y: number; active: boolean; alpha: number };
+
+  const LAYERS = [5, 7, 6, 4]; // input, hidden layers, output
+  const LAYERS_COMPACT = [4, 5, 5, 3]; // small laptops: narrow side columns, lighter density
+  const LAYERS_WIDE = [5, 7, 8, 6, 4]; // wide screens: one extra hidden layer fills the width
+  const COMPACT_BELOW = 220; // canvas CSS widths (px) that switch layouts
+  const WIDE_FROM = 360;
+  const DROPOUT_RATE = 0.35;
+  const EPOCH_MS = 2500;
+  const NODE_BRIGHTNESS = 0.8; // peak opacity of a firing node and its glow
+  const CYAN = '0, 242, 254'; // --ds-accent
+  const TEAL = '0, 191, 166'; // --accent: cyan washes out on the light surface
+  const EMERALD = '16, 185, 129'; // --ds-accent-2
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isDark = () => document.documentElement.classList.contains('dark');
+
+  class DropoutNetwork {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    mirrored: boolean;
+    layers: NetNode[][] = [];
+    w = 0;
+    h = 0;
+    lastEpoch = 0;
+    running = false;
+    visible = false;
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d')!;
+      this.mirrored = canvas.dataset.side === 'right';
+      new ResizeObserver(() => this.resize()).observe(canvas);
+      new IntersectionObserver(([entry]) => {
+        this.visible = entry.isIntersecting;
+        this.visible ? this.start() : (this.running = false);
+      }).observe(canvas);
+    }
+
+    resize() {
+      const { width, height } = this.canvas.getBoundingClientRect();
+      if (width === 0 || height === 0) return; // display:none on mobile
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.w = width;
+      this.h = height;
+      this.canvas.width = Math.round(width * dpr);
+      this.canvas.height = Math.round(height * dpr);
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.layout(width < COMPACT_BELOW ? LAYERS_COMPACT : width >= WIDE_FROM ? LAYERS_WIDE : LAYERS);
+      this.draw();
+      this.start();
+    }
+
+    // Place nodes in evenly spaced columns; keep active states when the shape is unchanged.
+    layout(shape: number[]) {
+      const sameShape = this.layers.length === shape.length && this.layers.every((l, i) => l.length === shape[i]);
+      const pad = 10; // keeps node glows inside the canvas
+      const colGap = (this.w - pad * 2) / (shape.length - 1);
+      this.layers = shape.map((count, li) => {
+        const col = this.mirrored ? shape.length - 1 - li : li;
+        const x = pad + colGap * col;
+        const rowGap = this.h / (count + 1);
+        return Array.from({ length: count }, (_, ni) => {
+          const prev = sameShape ? this.layers[li][ni] : undefined;
+          return { x, y: rowGap * (ni + 1), active: prev?.active ?? true, alpha: prev?.alpha ?? 1 };
+        });
+      });
+      if (!sameShape) this.epoch();
+    }
+
+    // New dropout mask: only hidden layers drop; input and output always fire.
+    epoch() {
+      const last = this.layers.length - 1;
+      this.layers.forEach((layer, li) => {
+        for (const n of layer) n.active = li === 0 || li === last || Math.random() > DROPOUT_RATE;
+      });
+    }
+
+    draw() {
+      const { ctx, layers } = this;
+      const dark = isDark();
+      const accent = dark ? CYAN : TEAL;
+      ctx.clearRect(0, 0, this.w, this.h);
+
+      // Ease each node toward its target state so dropout fades rather than snaps.
+      for (const layer of layers) {
+        for (const n of layer) n.alpha += ((n.active ? 1 : 0) - n.alpha) * (reduced ? 1 : 0.08);
+      }
+
+      // 1. Synapses: bright only when both ends are firing.
+      ctx.shadowBlur = 0;
+      for (let l = 0; l < layers.length - 1; l++) {
+        for (const a of layers[l]) {
+          for (const b of layers[l + 1]) {
+            const fire = Math.min(a.alpha, b.alpha);
+            ctx.strokeStyle = fire > 0.02
+              ? `rgba(${accent}, ${0.03 + fire * (dark ? 0.22 : 0.3)})`
+              : dark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.05)';
+            ctx.lineWidth = 0.5 + fire * 0.7;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // 2. Nodes: dropped-out = hollow dim ring, firing = glowing filled dot.
+      layers.forEach((layer, li) => {
+        const rgb = li === layers.length - 1 ? EMERALD : accent;
+        for (const n of layer) {
+          const r = 5 + n.alpha * 2;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = dark ? 'rgba(18, 22, 31, 0.8)' : 'rgba(251, 253, 253, 0.9)';
+          ctx.strokeStyle = dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(91, 107, 112, 0.35)';
+          ctx.lineWidth = 1;
+          ctx.fill();
+          ctx.stroke();
+          if (n.alpha > 0.02) {
+            ctx.fillStyle = `rgba(${rgb}, ${n.alpha * NODE_BRIGHTNESS})`;
+            ctx.shadowColor = `rgba(${rgb}, ${n.alpha * NODE_BRIGHTNESS})`;
+            ctx.shadowBlur = 12;
+            ctx.fill();
+          }
+        }
+      });
+      ctx.shadowBlur = 0;
+    }
+
+    start() {
+      if (this.running || reduced || !this.visible || this.w === 0) return;
+      this.running = true;
+      const tick = (ts: number) => {
+        if (!this.running) return;
+        if (ts - this.lastEpoch >= EPOCH_MS) {
+          this.lastEpoch = ts;
+          this.epoch();
+        }
+        this.draw();
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>('canvas.dropout-net').forEach((c) => {
+    if (c.getContext('2d')) new DropoutNetwork(c);
+  });
+</script>

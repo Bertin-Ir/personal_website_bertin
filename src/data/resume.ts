@@ -76,18 +76,39 @@ export interface ExperienceEntry {
   period: string;
   /** Sort key, 'YYYY-MM' of the role's start month. Used to derive stats (e.g. years of experience) and to keep this list ordered. */
   startDate: string;
+  /** Which Work Experience tab the role appears under. */
+  category: 'technical' | 'other';
   description?: string;
   bullets?: string[];
+  /** Tech badges for this role. When omitted, badges are matched from the role text against data/skills.ts. */
+  skills?: string[];
 }
 
 // Ordered reverse-chronologically by startDate (most recent first).
+// Same-month starts keep the role order from the CV.
 export const experience: ExperienceEntry[] = [
   {
     role: 'Data Scientist',
     company: 'Sun Wolf Industries',
     location: 'Oklahoma, US',
-    period: '08/2026 – Present',
-    startDate: '2026-08',
+    period: '09/2026 – Present',
+    startDate: '2026-09',
+    category: 'technical',
+    skills: ['GeoPandas', 'SQL', 'Pandas', 'NumPy', 'Matplotlib'],
+    bullets: [
+      'Conducted market and competitive analysis of the oil and gas drilling industry to uncover underserved demand, identify high-value business opportunities, and inform strategic growth decisions for Sun Wolf Energy.',
+      'Developed a financial dashboard to track revenue, expenses, and financial performance, improving visibility into business performance and supporting data-driven operational and budgeting decisions.',
+    ],
+  },
+  {
+    role: 'Academic Center Assistant',
+    company: 'NYU Tulsa',
+    location: 'Oklahoma, US',
+    period: '09/2026 – Present',
+    startDate: '2026-09',
+    category: 'other',
+    description:
+      'Supported daily Academic Center operations by coordinating events and conferences, managing office supplies and inventory records, and maintaining accurate administrative documentation to ensure efficient day-to-day operations.',
   },
   {
     role: 'Analytics Engineering Intern',
@@ -95,9 +116,25 @@ export const experience: ExperienceEntry[] = [
     location: 'Kigali, Rwanda',
     period: '05/2026 – 08/2026',
     startDate: '2026-05',
+    category: 'technical',
+    skills: [
+      'Authentication & Authorization',
+      'FastAPI',
+      'Dagster',
+      'Keycloak',
+      'OAuth2 Proxy',
+      'Redis',
+      'Kong',
+      'Kubernetes',
+      'Docker',
+      'Helm',
+      'HashiCorp Vault',
+    ],
     bullets: [
       'Eliminated 100% of unauthorised access to production Dagster pipelines by designing and deploying a zero-trust authentication layer (Keycloak, OAuth2 Proxy, Redis, Kong) enforcing verified identity and MFA on every request across all environments.',
       'Designed, packaged, and deployed the complete platform infrastructure on Kubernetes using Helm charts — covering six interdependent services including the OAuth2 Proxy, Dagster pipeline orchestrator, Keycloak identity provider, HashiCorp Vault, Redis, and Kong — enabling consistent and repeatable deployments across environments through parameterised configuration.',
+      'Standardised authentication and authorisation across multiple Dagster instances (dev, staging, sandbox, production) and extended the same framework to additional micro-services — decoupling the auth layer from application code so any Kong-fronted system can adopt it with zero code changes.',
+      'Designed and delivered automated weekly pipeline performance reports for payment data infrastructure, tracking reliability and runtime metrics across multiple Dagster jobs processing millions of transactions. Boosted pipelines run success rate by 50%.',
     ],
   },
   {
@@ -106,6 +143,7 @@ export const experience: ExperienceEntry[] = [
     location: 'San Francisco, USA',
     period: '08/2025 – 12/2025',
     startDate: '2025-08',
+    category: 'other',
     description:
       'Completed rigorous training in algorithms, data structures, and performance optimization, strengthening system-level reasoning and scalability awareness for real-world software and ML pipelines.',
   },
@@ -115,8 +153,12 @@ export const experience: ExperienceEntry[] = [
     location: 'Dubai, UAE',
     period: '07/2025 – 08/2025',
     startDate: '2025-07',
-    description:
-      'Researched and automated admissions data collection for 700+ global universities, designing Python-based data pipelines that transformed raw datasets into actionable insights for students, advisors, and investors.',
+    category: 'technical',
+    bullets: [
+      'Researched and automated admissions data collection for 700+ leading universities worldwide, ensuring high accuracy and reliability.',
+      'Designed data pipelines in Python to clean, validate, and structure datasets into a smart, searchable admissions database designed to serve students, parents, and advisors across global markets.',
+      'Contributed to the strategic growth of Mentora by transforming raw university data into actionable insights that will inform advising and investor presentations. Used libraries such as pandas, NumPy, Seaborn, and Matplotlib.',
+    ],
   },
   {
     role: 'Mentor',
@@ -124,8 +166,10 @@ export const experience: ExperienceEntry[] = [
     location: 'Abu Dhabi, UAE',
     period: '06/2025 – 08/2025',
     startDate: '2025-06',
+    category: 'other',
     bullets: [
-      'Mentored and guided Summer Academy Scholars by providing academic support, residential life management, and ensuring timely completion of assignments.',
+      'Mentored and guided Summer Academy Scholars by providing mathematics tutoring and academic support, offering strategies for effective workload management, and ensuring the timely completion of assignments.',
+      'Fostered a supportive and disciplined residential environment for over 200 students through effective behavior management strategies, enhancing student well-being and holistic development.',
       'Coordinated between faculty, staff, and students to streamline program activities, resolve issues promptly, and enhance the overall Summer Academy experience.',
     ],
   },
@@ -135,6 +179,7 @@ export const experience: ExperienceEntry[] = [
     location: 'Abu Dhabi, UAE',
     period: '01/2025 – 12/2025',
     startDate: '2025-01',
+    category: 'technical',
     bullets: [
       'Trained users in effective research methodologies, including database navigation, source evaluation, and systematic literature review techniques.',
       'Supported research workflows by assisting with citation management, resource organization, and access to both print and digital collections.',
@@ -147,8 +192,9 @@ export const experience: ExperienceEntry[] = [
     location: 'Kigali, Rwanda',
     period: '02/2023 – 12/2023',
     startDate: '2023-02',
+    category: 'technical',
     description:
-      'Collected and analyzed GIS-based field data to track beneficiary locations and project progress, supporting efficient distribution of eco-friendly stoves.',
+      'Leveraged GPS technology to map beneficiary locations, enabling accurate distribution of eco-friendly stoves and supporting project monitoring through accurate data collection and analysis.',
   },
 ];
 

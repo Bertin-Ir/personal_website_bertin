@@ -12,72 +12,72 @@ const yearsSinceStart = Math.floor(monthsSinceStart / 12);
 
 const stats = [
   { value: projects.length, suffix: '+', label: 'Projects shipped' },
-  { value: yearsSinceStart, suffix: '+', label: 'Experience' },
+  { value: yearsSinceStart, suffix: '+', label: 'Years experience' },
   { value: skills.length, suffix: '+', label: 'Technologies mastered' },
 ];
 ---
 
-<section class="px-4 sm:px-6 py-12 md:py-16" aria-label="Highlights">
-  <div class="max-w-4xl mx-auto w-full min-w-0">
-    <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-16">
-      {stats.map((stat) => (
-        <div class="stat-item flex flex-col items-center text-center group" data-value={stat.value} data-suffix={stat.suffix}>
-          <p class="text-2xl md:text-3xl font-bold text-[var(--accent)] mb-1 transition-transform duration-200 group-hover:scale-105">
-            <span class="stat-value">0</span><span class="stat-suffix">{stat.suffix}</span>
-          </p>
-          <p class="text-sm text-[var(--ink)]/70">{stat.label}</p>
+<section class="px-4 sm:px-6 lg:px-8 pt-6 pb-12 md:pb-16" aria-label="Highlights">
+  <div class="w-full min-w-0">
+    <dl class="stats-grid grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden">
+      {stats.map((stat, i) => (
+        <div class="stat-item flex flex-col-reverse items-center text-center px-5 py-6 md:py-8" data-value={stat.value}>
+          <dt class="stat-label font-mono text-xs uppercase mt-2">{stat.label}</dt>
+          <dd class:list={['stat-number font-mono text-3xl md:text-4xl font-medium', i % 2 ? 'stat-number--alt' : '']}>
+            <span class="stat-value">{stat.value}</span>{stat.suffix}
+          </dd>
         </div>
       ))}
-    </div>
+    </dl>
   </div>
 </section>
 
 <script>
-  document.querySelectorAll('.stat-item').forEach(function(card) {
-    var target = parseInt(card.dataset.value || '0', 10);
-    var suffix = card.dataset.suffix || '';
-    var valEl = card.querySelector('.stat-value');
-    if (!valEl) return;
-    var duration = 1500;
-    var start = null;
-    function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
-    function animate(ts) {
-      if (!start) start = ts;
-      var elapsed = ts - start;
-      var progress = Math.min(elapsed / duration, 1);
-      var eased = easeOutQuart(progress);
-      var current = Math.floor(target * eased);
-      valEl.textContent = current;
-      if (progress < 1) requestAnimationFrame(animate);
-      else valEl.textContent = target;
-    }
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          requestAnimationFrame(animate);
+  // Count up from 0 when the panel scrolls into view. The real value is in the HTML,
+  // so without JS (or with reduced motion) the final numbers simply show.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLElement>('.stat-item').forEach((item) => {
+      const target = parseInt(item.dataset.value || '0', 10);
+      const valEl = item.querySelector('.stat-value');
+      if (!valEl) return;
+      valEl.textContent = '0';
+      const duration = 1500;
+      const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
+      const animate = (start: number) => (ts: number) => {
+        const progress = Math.min((ts - start) / duration, 1);
+        valEl.textContent = String(Math.floor(target * easeOutQuart(progress)));
+        if (progress < 1) requestAnimationFrame(animate(start));
+        else valEl.textContent = String(target);
+      };
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          requestAnimationFrame((ts) => animate(ts)(ts));
           observer.disconnect();
         }
-      });
-    }, { threshold: 0.3 });
-    observer.observe(card);
-  });
+      }, { threshold: 0.3 });
+      observer.observe(item);
+    });
+  }
 </script>
 
 <style>
-  .stat-item {
-    position: relative;
+  /* Same divided-grid treatment as the Work Experience metrics header */
+  .stats-grid {
+    background: var(--ds-border);
+    border: 1px solid var(--ds-border);
   }
-  @media (min-width: 640px) {
-    .stat-item + .stat-item::before {
-      content: '';
-      position: absolute;
-      left: -1.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 1px;
-      height: 2rem;
-      background: var(--ink);
-      opacity: 0.1;
-    }
+  .stat-item {
+    background: var(--ds-bg);
+  }
+  .stat-label {
+    letter-spacing: 0.08em;
+    color: var(--ds-muted);
+  }
+  .stat-number {
+    color: var(--ds-accent);
+    line-height: 1.1;
+  }
+  .stat-number--alt {
+    color: var(--ds-accent-2);
   }
 </style>

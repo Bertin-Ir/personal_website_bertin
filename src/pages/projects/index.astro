@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCarousel from '../../components/ProjectCarousel.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
 import { projects } from '../../data/projects';
 ---
 <BaseLayout title="Projects | Bertin" description="ML and AI projects — case studies and code.">
-  <ProjectCarousel projects={projects} />
+  <ProjectGrid projects={projects} />
 </BaseLayout>

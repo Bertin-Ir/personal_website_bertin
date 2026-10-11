@@ -1,0 +1,152 @@
+---
+import { projects, type Project } from '../data/projects';
+import { experience, type ExperienceEntry } from '../data/resume';
+
+// What to feature, in display order. All copy below is pulled from data/ as-is.
+const FEATURED = [
+  { project: '1' }, // Optimizing Direct Bank Marketing
+  { role: 'Analytics Engineering Intern' },
+  { project: '12' }, // EazyHomes
+  { project: '7' }, // Web & App Ad Click-Through Rate Prediction
+];
+const ROLE_BULLETS_SHOWN = 1;
+const ROLE_BADGES_SHOWN = 6;
+
+// "MM/YYYY – MM/YYYY" -> "May 2026 – August 2026" (same wording as the Work Experience page).
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const periodLabel = (period: string) =>
+  period.replace(/(\d{2})\/(\d{4})/g, (_, m, y) => `${MONTHS[Number(m) - 1]} ${y}`);
+
+type FeaturedItem =
+  | { kind: 'project'; p: Project }
+  | { kind: 'role'; r: ExperienceEntry; highlights: string[]; badges: string[] };
+
+const items = FEATURED.flatMap((f): FeaturedItem[] => {
+  if (f.project) {
+    const p = projects.find((x) => x.id === f.project);
+    return p ? [{ kind: 'project', p }] : [];
+  }
+  const r = experience.find((x) => x.role === f.role);
+  if (!r) return [];
+  return [{
+    kind: 'role',
+    r,
+    highlights: r.bullets?.slice(0, ROLE_BULLETS_SHOWN) ?? (r.description ? [r.description] : []),
+    badges: (r.skills ?? []).slice(0, ROLE_BADGES_SHOWN),
+  }];
+});
+---
+
+<section class="px-4 sm:px-6 lg:px-8 pt-4 pb-10" aria-labelledby="work-title">
+  <div class="w-full min-w-0">
+    <div class="flex items-center justify-center gap-3 mb-6">
+      <span class="work-bar w-1 h-7 rounded-full" aria-hidden="true"></span>
+      <h2 id="work-title" class="text-2xl md:text-3xl font-bold text-[var(--ink)]">Some of the Work</h2>
+    </div>
+
+    <!-- Flex rather than grid so a short last row is centred instead of left-aligned. -->
+    <ul class="flex flex-wrap justify-center gap-5">
+      {items.map((item, i) => (
+        <li class="work-cell flex">
+          {item.kind === 'project' ? (
+            <article class="ds-card rounded-2xl overflow-hidden flex flex-col w-full" aria-labelledby={`featured-${i}`}>
+              {item.p.image && (
+                <img
+                  src={item.p.image}
+                  alt={`Screenshot of ${item.p.title}`}
+                  class="w-full h-44 object-cover object-top border-b border-[var(--ds-border)]"
+                  loading="lazy"
+                />
+              )}
+              <div class="flex-1 flex flex-col p-5 md:p-6">
+                <p class="work-label font-mono text-xs uppercase">Featured project</p>
+                <h3 id={`featured-${i}`} class="work-project-title text-xl font-bold leading-tight mt-1 mb-3">{item.p.title}</h3>
+                <p class="work-body text-sm leading-relaxed">{item.p.description}</p>
+                {item.p.techStack.length > 0 && (
+                  <ul class="flex flex-wrap gap-1.5 mt-4" aria-label="Tech stack">
+                    {item.p.techStack.map((skill) => (
+                      <li class="ds-badge" data-skill={skill.toLowerCase()}>{skill}</li>
+                    ))}
+                  </ul>
+                )}
+                <div class="mt-auto pt-5">
+                  <a href={`/projects/#project-${item.p.id}`} class="ds-btn ds-btn--accent">
+                    View Project <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ) : (
+            <article class="ds-card rounded-2xl flex flex-col w-full p-5 md:p-6" aria-labelledby={`featured-${i}`}>
+              <p class="work-label font-mono text-xs uppercase">Featured role</p>
+              <h3 id={`featured-${i}`} class="work-role-title text-xl font-bold leading-tight mt-1">{item.r.role}</h3>
+              <p class="work-label text-sm mt-1">
+                {item.r.company} <span aria-hidden="true">·</span> <span class="font-mono text-xs">{periodLabel(item.r.period)}</span>
+              </p>
+              {item.highlights.length > 0 && (
+                <ul class="work-body text-sm leading-relaxed space-y-2 mt-4">
+                  {item.highlights.map((text) => (
+                    <li class="flex gap-2">
+                      <svg class="work-chevron w-3.5 h-3.5 mt-[0.3rem] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                      </svg>
+                      <span>{text}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {item.badges.length > 0 && (
+                <ul class="flex flex-wrap gap-1.5 mt-4" aria-label="Technologies">
+                  {item.badges.map((name) => (
+                    <li class="ds-badge ds-badge--accent" data-skill={name.toLowerCase()}>{name}</li>
+                  ))}
+                </ul>
+              )}
+              <div class="mt-auto pt-5">
+                <a href="/resume/" class="ds-btn">
+                  View Role Details <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </article>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* 1 / 2 / 3 columns; widths subtract the 1.25rem (gap-5) gutters. */
+  .work-cell {
+    width: 100%;
+  }
+  @media (min-width: 768px) {
+    .work-cell {
+      width: calc((100% - 1.25rem) / 2);
+    }
+  }
+  @media (min-width: 1024px) {
+    .work-cell {
+      width: calc((100% - 2.5rem) / 3);
+    }
+  }
+  .work-bar {
+    background: var(--ds-accent-2);
+  }
+  .work-label {
+    letter-spacing: 0.04em;
+    color: var(--ds-muted);
+  }
+  .work-project-title {
+    color: var(--ds-highlight);
+  }
+  .work-role-title {
+    color: var(--ds-heading);
+  }
+  .work-body {
+    color: var(--ds-text);
+  }
+  .work-chevron {
+    color: var(--ds-accent-2);
+  }
+</style>

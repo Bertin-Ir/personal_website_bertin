@@ -1,0 +1,182 @@
+---
+// Full-bleed interactive node graph for the hero. Fills its positioned parent;
+// nodes drift, link to near neighbours, and ease away from / link to the cursor.
+---
+<canvas id="node-network" class="absolute inset-0 w-full h-full z-0 pointer-events-none" aria-hidden="true"></canvas>
+
+<script>
+  type Node = { x: number; y: number; vx: number; vy: number; r: number; color: number };
+
+  // Per theme: [primary, secondary]. Light swaps cyan for the brand teal (cyan washes out on light).
+  const PALETTE = {
+    dark: { nodes: ['#00f2fe', '#10b981'], link: '0, 242, 254', linkAlpha: 0.35 },
+    light: { nodes: ['#00BFA6', '#10b981'], link: '0, 191, 166', linkAlpha: 0.45 },
+  };
+  const isDark = () => document.documentElement.classList.contains('dark');
+  const LINK_DIST = 120;
+  const MOUSE_RADIUS = 180;
+  const AREA_PER_NODE = 12000;
+  const MAX_NODES = 140;
+  const NODE_BRIGHTNESS = 0.8; // node + glow opacity
+
+  class NodeNetwork {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    host: HTMLElement;
+    nodes: Node[] = [];
+    mouse = { x: -1e4, y: -1e4, active: false };
+    w = 0;
+    h = 0;
+    running = false;
+    visible = true;
+    reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    constructor(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d')!;
+      this.host = canvas.parentElement!;
+
+      new ResizeObserver(() => this.resize()).observe(this.host);
+      new IntersectionObserver(([entry]) => {
+        this.visible = entry.isIntersecting;
+        this.visible ? this.start() : (this.running = false);
+      }).observe(this.host);
+
+      if (!this.reduced) {
+        this.host.addEventListener('pointermove', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          this.mouse.x = e.clientX - rect.left;
+          this.mouse.y = e.clientY - rect.top;
+          this.mouse.active = true;
+        });
+        this.host.addEventListener('pointerleave', () => (this.mouse.active = false));
+      }
+    }
+
+    makeNode(): Node {
+      return {
+        x: Math.random() * this.w,
+        y: Math.random() * this.h,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        r: Math.random() * 1.5 + 1.5,
+        color: Math.random() > 0.5 ? 0 : 1,
+      };
+    }
+
+    // Rescale existing nodes rather than regenerating, so mobile URL-bar resizes don't reshuffle the graph.
+    resize() {
+      const { width, height } = this.host.getBoundingClientRect();
+      if (width === 0 || height === 0) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const sx = this.w ? width / this.w : 1;
+      const sy = this.h ? height / this.h : 1;
+      this.w = width;
+      this.h = height;
+      this.canvas.width = Math.round(width * dpr);
+      this.canvas.height = Math.round(height * dpr);
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      for (const n of this.nodes) {
+        n.x *= sx;
+        n.y *= sy;
+      }
+      const count = Math.min(MAX_NODES, Math.floor((width * height) / AREA_PER_NODE));
+      while (this.nodes.length < count) this.nodes.push(this.makeNode());
+      this.nodes.length = count;
+
+      this.draw();
+    }
+
+    step() {
+      const { mouse } = this;
+      for (const n of this.nodes) {
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < 0 || n.x > this.w) n.vx *= -1;
+        if (n.y < 0 || n.y > this.h) n.vy *= -1;
+        n.x = Math.max(0, Math.min(this.w, n.x));
+        n.y = Math.max(0, Math.min(this.h, n.y));
+
+        // Ease nodes out of the cursor's radius.
+        if (mouse.active) {
+          const dx = n.x - mouse.x;
+          const dy = n.y - mouse.y;
+          const d = Math.hypot(dx, dy);
+          if (d > 0 && d < MOUSE_RADIUS) {
+            const push = (1 - d / MOUSE_RADIUS) * 1.2;
+            n.x += (dx / d) * push;
+            n.y += (dy / d) * push;
+          }
+        }
+      }
+    }
+
+    draw() {
+      const { ctx, nodes, mouse } = this;
+      const pal = isDark() ? PALETTE.dark : PALETTE.light;
+      ctx.clearRect(0, 0, this.w, this.h);
+
+      // Edges (no shadow: shadowBlur on every line is very expensive).
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 0.6;
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          if (Math.abs(dx) > LINK_DIST || Math.abs(dy) > LINK_DIST) continue;
+          const dist = Math.hypot(dx, dy);
+          if (dist < LINK_DIST) {
+            ctx.strokeStyle = `rgba(${pal.link}, ${(1 - dist / LINK_DIST) * pal.linkAlpha})`;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+        if (mouse.active) {
+          const dist = Math.hypot(a.x - mouse.x, a.y - mouse.y);
+          if (dist < MOUSE_RADIUS) {
+            ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - dist / MOUSE_RADIUS) * 0.45})`;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Nodes, with a soft glow.
+      ctx.globalAlpha = NODE_BRIGHTNESS;
+      ctx.shadowBlur = 8;
+      for (const n of nodes) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = pal.nodes[n.color];
+        ctx.shadowColor = pal.nodes[n.color];
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    start() {
+      if (this.running || this.reduced || !this.visible) return;
+      this.running = true;
+      const tick = () => {
+        if (!this.running) return;
+        this.step();
+        this.draw();
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+
+  const canvas = document.getElementById('node-network');
+  if (canvas instanceof HTMLCanvasElement && canvas.getContext('2d')) {
+    new NodeNetwork(canvas);
+  }
+</script>

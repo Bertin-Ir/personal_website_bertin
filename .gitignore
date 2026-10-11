@@ -1,2 +1,31 @@
-node_modules
-node_modules
+# dependencies
+node_modules/
+
+# build output (Vercel and the Pages workflow both build from source)
+dist/
+.vercel/
+
+# Astro generated types/cache
+.astro/
+
+# environment variables
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files (macOS, Windows / OneDrive)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# editors (.vscode/ is kept: its launch/tasks configs are shared on purpose)
+.idea/
+*.swp
+prompt.md

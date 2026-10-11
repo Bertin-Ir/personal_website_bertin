@@ -20,7 +20,6 @@ export const skills: Skill[] = [
   { name: 'Stata', category: 'Technologies' },
   { name: 'Git/GitHub', category: 'Technologies' },
   { name: 'PostgreSQL', category: 'Technologies' },
-  { name: 'Node.js', category: 'Technologies' },
   { name: 'Google Colab', category: 'Technologies' },
   { name: 'Arduino', category: 'Technologies' },
   { name: 'Excel', category: 'Technologies' },
@@ -34,4 +33,5 @@ export const skills: Skill[] = [
   { name: 'PyTorch', category: 'Libraries & Frameworks' },
   { name: 'Keras', category: 'Libraries & Frameworks' },
   { name: 'FastAPI', category: 'Libraries & Frameworks' },
+  { name: 'Node.js', category: 'Libraries & Frameworks' },
 ];
